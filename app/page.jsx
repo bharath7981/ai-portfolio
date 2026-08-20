@@ -29,38 +29,30 @@ export default function Home() {
     // Check if ?admin=true is present in URL
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      setIsAdmin(params.get("admin") === "true");
-    }
+      const adminMode = params.get("admin") === "true";
+      setIsAdmin(adminMode);
 
-    try {
-      const saved = localStorage.getItem("portfolio_user_data");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // Seamlessly merge saved edits while keeping fresh project walkthroughs
-        const mergedProjects = initialPortfolioData.projects.map((defProj) => {
-          const found = parsed.projects?.find((p) => p.id === defProj.id);
-          if (!found) return defProj;
-          return {
-            ...defProj,
-            ...found,
-            details: defProj.details || found.details,
-          };
-        });
-        setData({
-          ...initialPortfolioData,
-          ...parsed,
-          projects: mergedProjects,
-        });
+      if (adminMode) {
+        try {
+          const saved = localStorage.getItem("portfolio_user_data_v2");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            setData({
+              ...initialPortfolioData,
+              ...parsed,
+            });
+          }
+        } catch (e) {
+          console.error("Failed to load saved portfolio data", e);
+        }
       }
-    } catch (e) {
-      console.error("Failed to load saved portfolio data", e);
     }
   }, []);
 
   const handleSaveData = (newData) => {
     setData(newData);
     try {
-      localStorage.setItem("portfolio_user_data", JSON.stringify(newData));
+      localStorage.setItem("portfolio_user_data_v2", JSON.stringify(newData));
     } catch (e) {
       console.error("Failed to save portfolio data", e);
     }
@@ -69,6 +61,7 @@ export default function Home() {
   const handleResetData = () => {
     setData(initialPortfolioData);
     try {
+      localStorage.removeItem("portfolio_user_data_v2");
       localStorage.removeItem("portfolio_user_data");
     } catch (e) {
       console.error("Failed to reset portfolio data", e);

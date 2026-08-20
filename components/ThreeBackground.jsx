@@ -5,6 +5,21 @@ import { Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 import { Suspense, useEffect, useRef, useState } from "react";
 
+// Theme color palettes for 3D elements
+const THEME_COLORS = {
+  default: { wire: "#A855F7", node: "#22D3EE", sparkle: "#A855F7" },
+  "white-light": { wire: "#0284c7", node: "#d97706", sparkle: "#0284c7" },
+  "cyber-emerald": { wire: "#10b981", node: "#38bdf8", sparkle: "#10b981" },
+  "violet-obsidian": { wire: "#8b5cf6", node: "#06b6d4", sparkle: "#8b5cf6" },
+  "monochrome-titanium": { wire: "#38bdf8", node: "#a855f7", sparkle: "#38bdf8" },
+};
+
+function getThemeColors() {
+  if (typeof document === "undefined") return THEME_COLORS.default;
+  const theme = document.documentElement.getAttribute("data-theme") || "default";
+  return THEME_COLORS[theme] || THEME_COLORS.default;
+}
+
 // Regular icosahedron vertices for node graph dots
 const PHI = (1 + Math.sqrt(5)) / 2;
 const RAW_VERTICES = [
@@ -17,7 +32,7 @@ const NODE_VERTICES = RAW_VERTICES.map(([x, y, z]) => [x / VLEN, y / VLEN, z / V
   (_, i) => i % 2 === 0
 );
 
-function NodeGraph({ reduceMotion, mousePos }) {
+function NodeGraph({ reduceMotion, mousePos, themeColors }) {
   const groupRef = useRef();
   const wireMaterialRef = useRef();
   const nodeRefs = useRef([]);
@@ -29,6 +44,16 @@ function NodeGraph({ reduceMotion, mousePos }) {
   const currentNodeMult = useRef(1.0);
   const tiltX = useRef(0);
   const tiltY = useRef(0);
+
+  // Update material colors when theme changes
+  useEffect(() => {
+    if (wireMaterialRef.current) {
+      wireMaterialRef.current.color.set(themeColors.wire);
+    }
+    nodeMaterialsRef.current.forEach((mat) => {
+      if (mat) mat.color.set(themeColors.node);
+    });
+  }, [themeColors]);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
@@ -116,19 +141,19 @@ function NodeGraph({ reduceMotion, mousePos }) {
 
   return (
     <group ref={groupRef} position={[2.2, 0.2, 0]} scale={1.8}>
-      {/* Primary wireframe — Violet edges (Void Neon) */}
+      {/* Primary wireframe — theme-aware edges */}
       <lineSegments>
         <edgesGeometry args={[new THREE.IcosahedronGeometry(1, 1)]} />
-        <lineBasicMaterial ref={wireMaterialRef} color="#A855F7" transparent opacity={0.55} />
+        <lineBasicMaterial ref={wireMaterialRef} color={themeColors.wire} transparent opacity={0.55} />
       </lineSegments>
 
-      {/* Cyan node markers */}
+      {/* Theme-aware node markers */}
       {NODE_VERTICES.map(([x, y, z], i) => (
         <mesh key={i} position={[x, y, z]} ref={(el) => (nodeRefs.current[i] = el)}>
           <sphereGeometry args={[0.045, 10, 10]} />
           <meshBasicMaterial
             ref={(el) => (nodeMaterialsRef.current[i] = el)}
-            color="#22D3EE"
+            color={themeColors.node}
             transparent
             opacity={0.95}
           />
@@ -140,6 +165,7 @@ function NodeGraph({ reduceMotion, mousePos }) {
 
 export default function ThreeBackground() {
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [themeColors, setThemeColors] = useState(THEME_COLORS.default);
   const mousePos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -148,6 +174,22 @@ export default function ThreeBackground() {
     const onChange = () => setReduceMotion(mq.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  // Listen for theme changes via MutationObserver on <html>
+  useEffect(() => {
+    setThemeColors(getThemeColors());
+
+    const observer = new MutationObserver(() => {
+      setThemeColors(getThemeColors());
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -165,9 +207,9 @@ export default function ThreeBackground() {
     <div className="fixed inset-0 pointer-events-none z-0">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 1.25]}>
         <Suspense fallback={null}>
-          <NodeGraph reduceMotion={reduceMotion} mousePos={mousePos} />
+          <NodeGraph reduceMotion={reduceMotion} mousePos={mousePos} themeColors={themeColors} />
           {!reduceMotion && (
-            <Sparkles count={16} scale={8} size={1.1} speed={0.2} opacity={0.2} color="#A855F7" />
+            <Sparkles count={16} scale={8} size={1.1} speed={0.2} opacity={0.2} color={themeColors.sparkle} />
           )}
         </Suspense>
       </Canvas>

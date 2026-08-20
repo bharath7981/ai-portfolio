@@ -25,7 +25,10 @@
   --color-fog: #475569;
   --color-signal: #d97706;
   --color-wire: #0284c7;
-  --color-line: #cbd5e1;
+  --color-line: #e2e8f0;
+  --dot-grid-color: rgba(2, 132, 199, 0.06);
+  --glow-color: rgba(217, 119, 6, 0.12);
+  --glow-color-strong: rgba(217, 119, 6, 0.22);
 }
 
 [data-theme="cyber-emerald"] {
@@ -88,10 +91,10 @@ body {
   overscroll-behavior-y: auto;
   transition: background-color 0.4s ease, color 0.4s ease;
 
-  /* Subtle dot-grid pattern for depth */
+  /* Subtle dot-grid pattern for depth (adapts via --dot-grid-color) */
   background-image: radial-gradient(
     circle,
-    rgba(168, 85, 247, 0.07) 1px,
+    var(--dot-grid-color, rgba(168, 85, 247, 0.07)) 1px,
     transparent 1px
   );
   background-size: 28px 28px;
@@ -144,7 +147,7 @@ body {
 }
 
 .shimmer-text {
-  background: linear-gradient(90deg, #A855F7, #22D3EE, #F0EEFF, #A855F7);
+  background: linear-gradient(90deg, var(--color-signal), var(--color-wire), var(--color-paper), var(--color-signal));
   background-size: 250% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -152,10 +155,10 @@ body {
   animation: shimmer 4s linear infinite;
 }
 
-/* ── Subtle Ambient Violet Glow Pulse ───────────────────────────────── */
+/* ── Subtle Ambient Glow Pulse (adapts via --glow-color) ────────────── */
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), 0 0 40px rgba(168, 85, 247, 0.06); }
-  50%       { box-shadow: 0 0 30px rgba(168, 85, 247, 0.30), 0 0 60px rgba(168, 85, 247, 0.12); }
+  0%, 100% { box-shadow: 0 0 20px var(--glow-color, rgba(168, 85, 247, 0.15)), 0 0 40px var(--glow-color, rgba(168, 85, 247, 0.06)); }
+  50%       { box-shadow: 0 0 30px var(--glow-color-strong, rgba(168, 85, 247, 0.30)), 0 0 60px var(--glow-color, rgba(168, 85, 247, 0.12)); }
 }
 
 .glow-card {

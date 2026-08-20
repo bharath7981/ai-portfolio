@@ -2,28 +2,6 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-// Parse a CSS color (hex or rgb) into { r, g, b } [0–255]
-function parseColor(cssColor) {
-  if (!cssColor) return { r: 34, g: 211, b: 238 }; // fallback cyan
-  const el = document.createElement("div");
-  el.style.color = cssColor;
-  document.body.appendChild(el);
-  const computed = getComputedStyle(el).color;
-  document.body.removeChild(el);
-
-  const match = computed.match(/\d+/g);
-  if (match && match.length >= 3) {
-    return { r: +match[0], g: +match[1], b: +match[2] };
-  }
-  return { r: 34, g: 211, b: 238 };
-}
-
-function getThemeParticleColor() {
-  const style = getComputedStyle(document.documentElement);
-  const wireColor = style.getPropertyValue("--color-wire").trim();
-  return parseColor(wireColor);
-}
-
 export default function FogParticles() {
   const canvasRef = useRef(null);
 
@@ -37,23 +15,11 @@ export default function FogParticles() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Active particle color (updated on theme change)
-    let pColor = getThemeParticleColor();
-
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
     window.addEventListener("resize", handleResize);
-
-    // Listen for theme changes
-    const themeObserver = new MutationObserver(() => {
-      pColor = getThemeParticleColor();
-    });
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
 
     // Subtle pointer tracking for touch/hover dissolve
     const pointer = { x: -1000, y: -1000, touchVanishRadius: 38, active: false };
@@ -83,9 +49,9 @@ export default function FogParticles() {
     window.addEventListener("touchstart", handleTouchMove, { passive: true });
     window.addEventListener("mouseleave", handlePointerLeave);
 
-    // Highly limited, subtle ambient particles
+    // Highly limited, subtle ambient particles (prevent any visual distraction)
     const isMobile = width < 768;
-    const NUM_PARTICLES = isMobile ? 6 : 14;
+    const NUM_PARTICLES = isMobile ? 6 : 14; // Strictly limited count
     const MAX_LINE_DIST = 85;
     const MAX_LINE_DIST_SQ = MAX_LINE_DIST * MAX_LINE_DIST;
 
@@ -100,11 +66,11 @@ export default function FogParticles() {
       reset(initial = false) {
         this.x = Math.random() * width;
         this.y = initial ? Math.random() * height : height + 15;
-        this.baseRadius = Math.random() * 0.8 + 1.0;
+        this.baseRadius = Math.random() * 0.8 + 1.0; // Delicate 1.0px - 1.8px
         this.radius = this.baseRadius;
-        this.vx = (Math.random() - 0.5) * 0.18;
+        this.vx = (Math.random() - 0.5) * 0.18; // Very slow ambient drift
         this.vy = -(Math.random() * 0.25 + 0.12);
-        this.baseAlpha = Math.random() * 0.25 + 0.3;
+        this.baseAlpha = Math.random() * 0.25 + 0.3; // Soft 0.3 - 0.55 opacity
         this.alpha = initial ? this.baseAlpha : 0;
         this.targetAlpha = this.baseAlpha;
         this.pulseSpeed = Math.random() * 0.015 + 0.008;
@@ -166,21 +132,19 @@ export default function FogParticles() {
 
       draw(context) {
         if (this.vanished || this.alpha <= 0) return;
-        const { r, g, b } = pColor;
 
         context.save();
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
-        context.shadowColor = `rgb(${r}, ${g}, ${b})`;
+        context.shadowColor = "#22D3EE";
         context.shadowBlur = 4;
-        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.alpha})`;
+        context.fillStyle = `rgba(34, 211, 238, ${this.alpha})`;
         context.fill();
 
-        // Bright core
         context.beginPath();
         context.arc(this.x, this.y, this.radius * 0.5, 0, Math.PI * 2);
-        context.fillStyle = `rgba(${Math.min(255, r + 80)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 20)}, ${this.alpha * 0.9})`;
+        context.fillStyle = `rgba(240, 254, 255, ${this.alpha * 0.9})`;
         context.shadowBlur = 1;
         context.fill();
         context.restore();
@@ -194,9 +158,8 @@ export default function FogParticles() {
     // Main render loop
     const render = () => {
       ctx.clearRect(0, 0, width, height);
-      const { r, g, b } = pColor;
 
-      // 1. Subtle, Rare Connecting Lines
+      // 1. Subtle, Rare Connecting Line (Max 1 link per particle, faint opacity)
       const linked = new Uint8Array(particles.length);
       for (let i = 0; i < particles.length; i++) {
         const p1 = particles[i];
@@ -218,7 +181,7 @@ export default function FogParticles() {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${lineOpacity})`;
+            ctx.strokeStyle = `rgba(34, 211, 238, ${lineOpacity})`;
             ctx.lineWidth = 0.7;
             ctx.stroke();
             ctx.restore();
@@ -256,12 +219,16 @@ export default function FogParticles() {
         ctx.arc(wisp.x, wisp.y, wisp.radius, 0, Math.PI * 2);
 
         const grad = ctx.createRadialGradient(
-          wisp.x, wisp.y, 0,
-          wisp.x, wisp.y, wisp.radius
+          wisp.x,
+          wisp.y,
+          0,
+          wisp.x,
+          wisp.y,
+          wisp.radius
         );
-        grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${wisp.alpha * 0.5})`);
-        grad.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${wisp.alpha * 0.18})`);
-        grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        grad.addColorStop(0, `rgba(34, 211, 238, ${wisp.alpha * 0.5})`);
+        grad.addColorStop(0.5, `rgba(34, 211, 238, ${wisp.alpha * 0.18})`);
+        grad.addColorStop(1, "rgba(34, 211, 238, 0)");
 
         ctx.fillStyle = grad;
         ctx.fill();
@@ -275,7 +242,6 @@ export default function FogParticles() {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      themeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handlePointerMove);
       window.removeEventListener("touchmove", handleTouchMove);

@@ -51,9 +51,7 @@ export default function FogParticles() {
 
     // Highly limited, subtle ambient particles (prevent any visual distraction)
     const isMobile = width < 768;
-    const NUM_PARTICLES = isMobile ? 6 : 14; // Strictly limited count
-    const MAX_LINE_DIST = 85;
-    const MAX_LINE_DIST_SQ = MAX_LINE_DIST * MAX_LINE_DIST;
+    const NUM_PARTICLES = isMobile ? 6 : 14;
 
     const particles = [];
     const fogWisps = [];
@@ -159,41 +157,7 @@ export default function FogParticles() {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Subtle, Rare Connecting Line (Max 1 link per particle, faint opacity)
-      const linked = new Uint8Array(particles.length);
-      for (let i = 0; i < particles.length; i++) {
-        const p1 = particles[i];
-        if (p1.vanished || p1.alpha <= 0.1 || linked[i]) continue;
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          if (p2.vanished || p2.alpha <= 0.1 || linked[j]) continue;
-
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const distSq = dx * dx + dy * dy;
-
-          if (distSq < MAX_LINE_DIST_SQ) {
-            const dist = Math.sqrt(distSq);
-            const lineOpacity = (1 - dist / MAX_LINE_DIST) * Math.min(p1.alpha, p2.alpha) * 0.25;
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(34, 211, 238, ${lineOpacity})`;
-            ctx.lineWidth = 0.7;
-            ctx.stroke();
-            ctx.restore();
-
-            linked[i] = 1;
-            linked[j] = 1;
-            break;
-          }
-        }
-      }
-
-      // 2. Draw Floating Dots
+      // Draw Floating Dots
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw(ctx);

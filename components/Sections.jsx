@@ -212,7 +212,7 @@ export function HeroSection({ data = {} }) {
   return (
     <section
       id="hero"
-      className="portfolio-section min-h-screen pt-32 pb-20 flex flex-col justify-between px-6 md:px-12 max-w-7xl mx-auto relative z-10 scroll-mt-24 overflow-hidden"
+      className="portfolio-section min-h-screen pt-24 sm:pt-32 pb-12 sm:pb-20 flex flex-col justify-between px-4 sm:px-8 md:px-12 max-w-7xl mx-auto relative z-10 scroll-mt-24 overflow-hidden"
     >
       {/* Top Metadata Bar */}
       <motion.div
@@ -220,17 +220,17 @@ export function HeroSection({ data = {} }) {
         whileInView="visible"
         viewport={{ once: false, amount: 0.1 }}
         variants={staggerContainer}
-        className="w-full flex items-center justify-between font-mono text-xs uppercase tracking-[0.25em] text-fog/80 border-b border-line/40 pb-4"
+        className="w-full flex items-center justify-between font-mono text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-[0.25em] text-fog/80 border-b border-line/40 pb-3 sm:pb-4"
       >
-        <motion.span variants={dropFromTop} className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-signal animate-ping" />
+        <motion.span variants={dropFromTop} className="flex items-center gap-1.5 sm:gap-2">
+          <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-signal animate-ping" />
           INTRO
         </motion.span>
-        <motion.span variants={dropFromTop} className="hidden sm:inline text-wire font-medium">
+        <motion.span variants={dropFromTop} className="hidden md:inline text-wire font-medium">
           {title}
         </motion.span>
-        <motion.span variants={dropFromTop} className="text-fog/60">
-          LOCATION: {location}
+        <motion.span variants={dropFromTop} className="text-fog/60 text-[9px] sm:text-xs">
+          {location}
         </motion.span>
       </motion.div>
 
@@ -240,16 +240,16 @@ export function HeroSection({ data = {} }) {
         whileInView="visible"
         viewport={{ once: false, amount: 0.1 }}
         variants={staggerContainer}
-        className="my-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+        className="my-auto py-6 sm:py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center"
       >
-        <div className="lg:col-span-8 space-y-6">
-          <motion.div variants={slideFromLeft} className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-wire border border-wire/30 bg-wire/5 px-3.5 py-1.5 rounded-full">
-            <Sparkles className="w-3.5 h-3.5 text-wire" />
-            <span>{tagline}</span>
+        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+          <motion.div variants={slideFromLeft} className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs uppercase tracking-widest text-wire border border-wire/30 bg-wire/5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full max-w-full">
+            <Sparkles className="w-3.5 h-3.5 text-wire shrink-0" />
+            <span className="truncate">{tagline}</span>
           </motion.div>
 
           {/* Animated Headline Words with Text Scramble Effect */}
-          <div className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight uppercase leading-[0.95] overflow-hidden space-y-1 py-1">
+          <div className="font-display text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight uppercase leading-[1.05] sm:leading-[0.95] overflow-hidden space-y-1 py-1">
             <div className="overflow-hidden">
               <ScrambleWord word={firstName} delay={800} className="text-paper block drop-shadow-md" />
             </div>
@@ -260,33 +260,33 @@ export function HeroSection({ data = {} }) {
 
           <motion.p
             variants={slideFromLeft}
-            className="text-lg sm:text-xl text-fog font-light max-w-2xl leading-relaxed"
+            className="text-sm sm:text-lg md:text-xl text-fog font-light max-w-2xl leading-relaxed"
           >
             {subtagline}
           </motion.p>
 
           {/* Jelly Live Terminal Status Widget (Slide from Right) */}
           <motion.div variants={slideFromRight}>
-            <JellyCard className="p-4 bg-ink-deep/90 border border-line/60 font-mono text-xs text-fog max-w-2xl space-y-1.5 rounded-xl shadow-lg shadow-black/30 overflow-hidden">
+            <JellyCard className="p-3.5 sm:p-4 bg-ink-deep/90 border border-line/60 font-mono text-xs text-fog max-w-2xl space-y-1.5 rounded-xl shadow-lg shadow-black/30 overflow-hidden">
               <div className="flex items-center justify-between border-b border-line/40 pb-2 text-[10px] text-fog/60">
                 <span className="flex items-center gap-1.5 text-wire">
-                  <Terminal className="w-3 h-3" /> SYS.STATUS // ENGINE_ACTIVE
+                  <Terminal className="w-3 h-3 shrink-0" /> SYS.STATUS // ACTIVE
                 </span>
                 <span className="text-signal font-medium">● 200 OK</span>
               </div>
-              <div className="pt-1 space-y-1">
-                <p className="text-paper flex items-center gap-2">
-                  <span className="text-signal">&gt;</span> <span className="text-wire font-semibold">LANGGRAPH:</span> Multi-agent DAG execution pipeline initialized.
+              <div className="pt-1 space-y-1 text-[11px] sm:text-xs">
+                <p className="text-paper flex items-start gap-1.5">
+                  <span className="text-signal">&gt;</span> <span><span className="text-wire font-semibold">LANGGRAPH:</span> Multi-agent DAG execution pipeline initialized.</span>
                 </p>
-                <p className="text-paper flex items-center gap-2">
-                  <span className="text-signal">&gt;</span> <span className="text-wire font-semibold font-mono">RETRIEVAL:</span> RAG vector index ready (pgvector + Pinecone).
+                <p className="text-paper flex items-start gap-1.5">
+                  <span className="text-signal">&gt;</span> <span><span className="text-wire font-semibold font-mono">RETRIEVAL:</span> RAG vector index ready (ChromaDB + all-mpnet).</span>
                 </p>
               </div>
             </JellyCard>
           </motion.div>
 
           {/* Hero Action CTAs (Alternating Left / Right) */}
-          <div className="pt-2 flex flex-wrap items-center gap-4 overflow-hidden">
+          <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 overflow-hidden">
             <motion.a
               variants={slideFromLeft}
               href="#projects"
@@ -294,11 +294,11 @@ export function HeroSection({ data = {} }) {
                 e.preventDefault();
                 const el = document.getElementById("projects");
                 if (el) {
-                  if (window.lenis) window.lenis.scrollTo(el, { offset: -80 });
+                  if (window.lenis) window.lenis.scrollTo(el, { offset: -60 });
                   else el.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="group inline-flex items-center gap-3 px-7 py-3.5 bg-signal text-ink font-mono text-xs uppercase tracking-widest font-semibold rounded-xl hover:bg-wire transition-colors duration-300 shadow-lg shadow-signal/20"
+              className="group inline-flex items-center justify-center gap-3 px-6 sm:px-7 py-3 sm:py-3.5 bg-signal text-ink font-mono text-xs uppercase tracking-widest font-semibold rounded-xl hover:bg-wire transition-colors duration-300 shadow-lg shadow-signal/20 text-center"
             >
               <span>VIEW PROJECTS</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -311,11 +311,11 @@ export function HeroSection({ data = {} }) {
                 e.preventDefault();
                 const el = document.getElementById("contact");
                 if (el) {
-                  if (window.lenis) window.lenis.scrollTo(el, { offset: -80 });
+                  if (window.lenis) window.lenis.scrollTo(el, { offset: -60 });
                   else el.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="inline-flex items-center gap-2 px-7 py-3.5 border border-line hover:border-paper text-paper font-mono text-xs uppercase tracking-widest rounded-xl transition-colors duration-300 bg-ink-deep/50 backdrop-blur-sm"
+              className="inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 border border-line hover:border-paper text-paper font-mono text-xs uppercase tracking-widest rounded-xl transition-colors duration-300 bg-ink-deep/50 backdrop-blur-sm text-center"
             >
               <span>GET IN TOUCH</span>
               <span className="text-signal">↗</span>

@@ -49,9 +49,12 @@ export default function FogParticles() {
     window.addEventListener("touchstart", handleTouchMove, { passive: true });
     window.addEventListener("mouseleave", handlePointerLeave);
 
-    // Minimalist, uncluttered constellation config
-    const NUM_PARTICLES = Math.min(48, Math.max(26, Math.floor((width * height) / 24000)));
-    const MAX_LINE_DIST = 115;
+    // Responsive minimalist constellation config
+    const isMobile = width < 768;
+    const NUM_PARTICLES = isMobile
+      ? Math.min(22, Math.floor((width * height) / 32000))
+      : Math.min(48, Math.max(26, Math.floor((width * height) / 24000)));
+    const MAX_LINE_DIST = isMobile ? 80 : 115;
     const MAX_LINE_DIST_SQ = MAX_LINE_DIST * MAX_LINE_DIST;
     const POINTER_LINE_DIST_SQ = pointer.maxConnectRadius * pointer.maxConnectRadius;
 

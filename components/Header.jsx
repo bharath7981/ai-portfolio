@@ -128,20 +128,20 @@ export default function Header({ onOpenEditor }) {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-10">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 md:px-10">
         {/* High-End Glassmorphic Brand Logo Badge */}
         <a
           href="#hero"
           onClick={(e) => scrollToSection(e, "#hero")}
-          className="group flex items-center gap-3 px-3.5 py-1.5 rounded-full bg-ink-deep/80 border border-line/70 hover:border-signal/80 backdrop-blur-md transition-all duration-300 shadow-md shadow-black/20 hover:shadow-signal/10"
+          className="group flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-ink-deep/80 border border-line/70 hover:border-signal/80 backdrop-blur-md transition-all duration-300 shadow-md shadow-black/20 hover:shadow-signal/10"
         >
           {/* Glowing Emblem Monogram */}
-          <span className="h-6 w-6 rounded-full bg-signal/10 border border-signal/40 flex items-center justify-center font-display font-bold text-[10px] text-signal group-hover:scale-110 group-hover:bg-signal group-hover:text-ink transition-all duration-300">
+          <span className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-signal/10 border border-signal/40 flex items-center justify-center font-display font-bold text-[9px] sm:text-[10px] text-signal group-hover:scale-110 group-hover:bg-signal group-hover:text-ink transition-all duration-300">
             BR
           </span>
 
           {/* Dual-Tone Stylized Typography */}
-          <div className="flex items-center gap-1.5 font-display text-xs uppercase tracking-[0.22em]">
+          <div className="flex items-center gap-1 sm:gap-1.5 font-display text-[11px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.22em]">
             <span className="font-bold text-paper group-hover:text-wire transition-colors">
               BHARATH
             </span>
@@ -202,22 +202,23 @@ export default function Header({ onOpenEditor }) {
         {/* Mobile Hamburger Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden font-mono text-xs text-paper p-2 focus:outline-none"
+          className="md:hidden font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full border border-line/70 bg-ink-deep/80 backdrop-blur-md text-paper hover:text-signal hover:border-signal transition-colors flex items-center gap-1.5 shadow-sm"
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? "✕ CLOSE" : "☰ MENU"}
+          <span className="text-signal">{mobileMenuOpen ? "✕" : "☰"}</span>
+          <span>{mobileMenuOpen ? "CLOSE" : "MENU"}</span>
         </button>
       </div>
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-ink-deep/95 backdrop-blur-xl border-b border-line/40 px-6 py-6 space-y-4">
+        <div className="md:hidden bg-ink-deep/95 backdrop-blur-xl border-b border-line/40 px-6 py-6 space-y-3.5 shadow-2xl">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.label}
               href={item.href}
               onClick={(e) => scrollToSection(e, item.href)}
-              className="block font-mono text-sm tracking-widest text-fog hover:text-signal py-1"
+              className="block font-mono text-xs uppercase tracking-widest text-fog hover:text-signal py-1.5 border-b border-line/20"
             >
               {item.label}
             </a>
@@ -225,16 +226,16 @@ export default function Header({ onOpenEditor }) {
 
           {/* Mobile Editor Trigger */}
           {onOpenEditor && (
-            <div className="pt-2 border-t border-line/40">
+            <div className="pt-2">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenEditor();
                 }}
-                className="w-full py-2.5 bg-signal text-ink font-mono text-xs font-semibold rounded-xl flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-signal text-ink font-mono text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-md"
               >
                 <Edit3 className="w-4 h-4" />
-                <span>EDIT WEBSITE DETAILS ⚙️</span>
+                <span>EDIT DETAILS ⚙️</span>
               </button>
             </div>
           )}
@@ -242,7 +243,7 @@ export default function Header({ onOpenEditor }) {
           <a
             href="#contact"
             onClick={(e) => scrollToSection(e, "#contact")}
-            className="block text-center font-mono text-xs tracking-widest px-4 py-2 border border-signal text-signal rounded-xl hover:bg-signal hover:text-ink transition-colors mt-4"
+            className="block text-center font-mono text-xs uppercase tracking-widest px-4 py-2.5 border border-signal text-signal rounded-xl hover:bg-signal hover:text-ink transition-colors mt-2"
           >
             LET&apos;S TALK ↗
           </a>

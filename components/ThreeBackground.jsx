@@ -77,9 +77,13 @@ function NodeGraph({ reduceMotion, mousePos }) {
     }
 
     if (window.innerWidth < 768) {
-      targetX = 0; targetZ = -1.5; targetScale *= 0.65; targetOpacity *= 0.7;
+      targetX = 0;
+      targetY = -0.3;
+      targetZ = -2.2;
+      targetScale *= 0.55;
+      targetOpacity *= 0.35;
     }
-    if (reduceMotion) { targetOpacity = 0.4; targetNodeMult = 0.3; }
+    if (reduceMotion) { targetOpacity = 0.3; targetNodeMult = 0.3; }
 
     // 5. Smooth lerped transforms
     groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, targetX, 0.05);

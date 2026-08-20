@@ -21,8 +21,8 @@ export default function FogParticles() {
     };
     window.addEventListener("resize", handleResize);
 
-    // Track cursor and touch points
-    const pointer = { x: -1000, y: -1000, radius: 65, active: false };
+    // Track cursor and touch coordinates
+    const pointer = { x: -1000, y: -1000, touchVanishRadius: 42, maxConnectRadius: 130, active: false };
 
     const handlePointerMove = (e) => {
       pointer.x = e.clientX;
@@ -49,10 +49,14 @@ export default function FogParticles() {
     window.addEventListener("touchstart", handleTouchMove, { passive: true });
     window.addEventListener("mouseleave", handlePointerLeave);
 
-    // Particle class for floating #22D3EE cyan dots
-    const NUM_PARTICLES = Math.min(65, Math.floor((width * height) / 18000));
+    // Minimalist, uncluttered constellation config
+    const NUM_PARTICLES = Math.min(48, Math.max(26, Math.floor((width * height) / 24000)));
+    const MAX_LINE_DIST = 115;
+    const MAX_LINE_DIST_SQ = MAX_LINE_DIST * MAX_LINE_DIST;
+    const POINTER_LINE_DIST_SQ = pointer.maxConnectRadius * pointer.maxConnectRadius;
+
     const particles = [];
-    const fogWisps = []; // Dispersed fog sub-particles
+    const fogWisps = []; // Dispersed fog mist particles
 
     class Particle {
       constructor() {
@@ -62,11 +66,11 @@ export default function FogParticles() {
       reset(initial = false) {
         this.x = Math.random() * width;
         this.y = initial ? Math.random() * height : height + 15;
-        this.baseRadius = Math.random() * 1.8 + 1.2; // Small delicate dots (1.2px - 3.0px)
+        this.baseRadius = Math.random() * 1.5 + 1.2; // Small 1.2px - 2.7px clean dots
         this.radius = this.baseRadius;
-        this.vx = (Math.random() - 0.5) * 0.35; // Gentle horizontal drift
-        this.vy = -(Math.random() * 0.45 + 0.2); // Slow upward float
-        this.baseAlpha = Math.random() * 0.5 + 0.35; // 0.35 - 0.85 opacity
+        this.vx = (Math.random() - 0.5) * 0.28; // Subtle drift
+        this.vy = -(Math.random() * 0.38 + 0.16); // Gentle upward float
+        this.baseAlpha = Math.random() * 0.4 + 0.45; // 0.45 - 0.85 opacity
         this.alpha = initial ? this.baseAlpha : 0;
         this.targetAlpha = this.baseAlpha;
         this.pulseSpeed = Math.random() * 0.02 + 0.01;
@@ -78,15 +82,15 @@ export default function FogParticles() {
       update() {
         if (this.vanished) {
           this.respawnTimer++;
-          if (this.respawnTimer > 90) { // Respawn after ~1.5s
+          if (this.respawnTimer > 85) { // Respawn after ~1.4s
             this.reset(false);
           }
           return;
         }
 
-        // Ambient floating motion
+        // Ambient floating drift
         this.pulse += this.pulseSpeed;
-        this.x += this.vx + Math.sin(this.pulse) * 0.25;
+        this.x += this.vx + Math.sin(this.pulse) * 0.18;
         this.y += this.vy;
 
         // Fade in when newly spawned
@@ -94,36 +98,37 @@ export default function FogParticles() {
           this.alpha = Math.min(this.targetAlpha, this.alpha + 0.02);
         }
 
-        // Screen boundary wrap
+        // Boundary wrap
         if (this.y < -20) this.reset(false);
         if (this.x < -20) this.x = width + 10;
         if (this.x > width + 20) this.x = -10;
 
-        // Check interaction with cursor/touch
+        // Touch & Cursor interaction
         if (pointer.active) {
           const dx = this.x - pointer.x;
           const dy = this.y - pointer.y;
-          const dist = Math.hypot(dx, dy);
+          const distSq = dx * dx + dy * dy;
 
-          if (dist < pointer.radius) {
-            // Touch trigger: Vanish and burst into fog wisps!
+          // Direct Touch / Proximity: Vanish into clean expanding fog mist
+          if (distSq < pointer.touchVanishRadius * pointer.touchVanishRadius) {
+            const dist = Math.sqrt(distSq);
             this.vanished = true;
             this.respawnTimer = 0;
 
-            // Spawn 6-9 subtle micro fog mist particles
-            const wispCount = Math.floor(Math.random() * 4) + 6;
+            // 6-8 micro fog wisps
+            const wispCount = Math.floor(Math.random() * 3) + 6;
             for (let i = 0; i < wispCount; i++) {
               const angle = Math.random() * Math.PI * 2;
-              const speed = Math.random() * 1.8 + 0.6;
+              const speed = Math.random() * 1.6 + 0.5;
               fogWisps.push({
                 x: this.x,
                 y: this.y,
-                vx: Math.cos(angle) * speed + (dx / (dist || 1)) * 0.8,
-                vy: Math.sin(angle) * speed + (dy / (dist || 1)) * 0.8,
-                radius: Math.random() * 3 + 2,
+                vx: Math.cos(angle) * speed + (dx / (dist || 1)) * 0.7,
+                vy: Math.sin(angle) * speed + (dy / (dist || 1)) * 0.7,
+                radius: Math.random() * 2.5 + 2,
                 maxRadius: Math.random() * 14 + 10,
-                alpha: this.alpha * 0.8,
-                decay: Math.random() * 0.025 + 0.018,
+                alpha: this.alpha * 0.75,
+                decay: Math.random() * 0.024 + 0.016,
               });
             }
           }
@@ -137,23 +142,23 @@ export default function FogParticles() {
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 
-        // Glowing #22D3EE cyan dot with soft halo
+        // Glowing #22D3EE cyan halo
         context.shadowColor = "#22D3EE";
-        context.shadowBlur = 8;
+        context.shadowBlur = 6;
         context.fillStyle = `rgba(34, 211, 238, ${this.alpha})`;
         context.fill();
 
-        // Inner bright white-cyan core for jewel-like quality
+        // Bright white-cyan core
         context.beginPath();
         context.arc(this.x, this.y, this.radius * 0.45, 0, Math.PI * 2);
-        context.fillStyle = `rgba(240, 254, 255, ${this.alpha * 0.9})`;
+        context.fillStyle = `rgba(240, 254, 255, ${this.alpha * 0.95})`;
         context.shadowBlur = 2;
         context.fill();
         context.restore();
       }
     }
 
-    // Populate particles
+    // Populate particle cloud with generous spacing
     for (let i = 0; i < NUM_PARTICLES; i++) {
       particles.push(new Particle());
     }
@@ -162,20 +167,96 @@ export default function FogParticles() {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // 1. Update and draw floating cyan dots
+      // Track connection counts per particle to prevent clumsy spiderweb clusters
+      const connectionCounts = new Uint8Array(particles.length);
+
+      // 1. Draw Clean Neural Constellation Lines between nearby dots (Max 2 connections per dot)
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+        if (p1.vanished || p1.alpha <= 0.08) continue;
+        if (connectionCounts[i] >= 2) continue;
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          if (p2.vanished || p2.alpha <= 0.08) continue;
+          if (connectionCounts[j] >= 2) continue;
+
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < MAX_LINE_DIST_SQ) {
+            const dist = Math.sqrt(distSq);
+            const lineOpacity = (1 - dist / MAX_LINE_DIST) * Math.min(p1.alpha, p2.alpha) * 0.45;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(34, 211, 238, ${lineOpacity})`;
+            ctx.lineWidth = 0.9;
+            ctx.shadowColor = "#22D3EE";
+            ctx.shadowBlur = 3;
+            ctx.stroke();
+            ctx.restore();
+
+            connectionCounts[i]++;
+            connectionCounts[j]++;
+            if (connectionCounts[i] >= 2) break;
+          }
+        }
+      }
+
+      // 2. Draw Interactive Pointer Constellation Lines (Max 2 closest particles)
+      if (pointer.active) {
+        let pointerLinks = 0;
+        for (let i = 0; i < particles.length && pointerLinks < 2; i++) {
+          const p = particles[i];
+          if (p.vanished || p.alpha <= 0.1) continue;
+
+          const dx = p.x - pointer.x;
+          const dy = p.y - pointer.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < POINTER_LINE_DIST_SQ && distSq >= pointer.touchVanishRadius * pointer.touchVanishRadius) {
+            const dist = Math.sqrt(distSq);
+            const pointerOpacity = (1 - dist / pointer.maxConnectRadius) * p.alpha * 0.55;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(pointer.x, pointer.y);
+
+            const grad = ctx.createLinearGradient(pointer.x, pointer.y, p.x, p.y);
+            grad.addColorStop(0, `rgba(168, 85, 247, ${pointerOpacity * 1.1})`);
+            grad.addColorStop(1, `rgba(34, 211, 238, ${pointerOpacity * 0.85})`);
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.0;
+            ctx.shadowColor = "#A855F7";
+            ctx.shadowBlur = 4;
+            ctx.stroke();
+            ctx.restore();
+
+            pointerLinks++;
+          }
+        }
+      }
+
+      // 3. Update & Draw Particles
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
         particles[i].draw(ctx);
       }
 
-      // 2. Update and draw dispersing fog wisps
+      // 4. Update & Draw Dispersing Fog Wisps
       for (let i = fogWisps.length - 1; i >= 0; i--) {
         const wisp = fogWisps[i];
         wisp.x += wisp.vx;
         wisp.y += wisp.vy;
-        wisp.vx *= 0.94; // Air resistance deceleration
+        wisp.vx *= 0.94;
         wisp.vy *= 0.94;
-        wisp.radius += (wisp.maxRadius - wisp.radius) * 0.08; // Expand like dissipating smoke/fog
+        wisp.radius += (wisp.maxRadius - wisp.radius) * 0.08;
         wisp.alpha -= wisp.decay;
 
         if (wisp.alpha <= 0) {
@@ -187,7 +268,6 @@ export default function FogParticles() {
         ctx.beginPath();
         ctx.arc(wisp.x, wisp.y, wisp.radius, 0, Math.PI * 2);
 
-        // Soft radial fog gradient
         const grad = ctx.createRadialGradient(
           wisp.x,
           wisp.y,

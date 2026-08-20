@@ -130,33 +130,6 @@ function useCountUp(target, inView, duration = 1200) {
   return `${prefix}${count}${suffix}`;
 }
 
-// ── Page Load Curtain ────────────────────────────────────────────────────────
-export function PageCurtain() {
-  const [done, setDone] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setDone(true), 1200);
-    return () => clearTimeout(t);
-  }, []);
-  if (done) return null;
-  return (
-    <motion.div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-signal"
-      initial={{ y: 0 }}
-      animate={{ y: "-100%" }}
-      transition={{ duration: 0.85, delay: 0.5, ease: [0.76, 0, 0.24, 1] }}
-      onAnimationComplete={() => setDone(true)}
-    >
-      <motion.span
-        className="font-mono text-ink text-xs uppercase tracking-[0.4em] font-bold"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 1, 1, 0] }}
-        transition={{ duration: 0.8, times: [0, 0.2, 0.8, 1] }}
-      >
-        BHARATH RASALAPU // LOADING
-      </motion.span>
-    </motion.div>
-  );
-}
 
 // Shared Section Header Label
 function SectionHeader({ index, label, subtitle }) {

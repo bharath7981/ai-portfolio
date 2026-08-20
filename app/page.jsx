@@ -17,7 +17,6 @@ import {
   ExperienceSection,
   ContactSection,
   Footer,
-  PageCurtain,
 } from "@/components/Sections";
 import { Edit3 } from "lucide-react";
 
@@ -74,9 +73,6 @@ export default function Home() {
       <main className="relative bg-ink text-paper min-h-screen overflow-x-hidden">
         {/* Fixed Header navigation + scroll progress */}
         <Header onOpenEditor={() => setEditorOpen(true)} />
-
-        {/* Page Load Curtain Reveal */}
-        <PageCurtain />
 
         {/* 3D Canvas Layer with scroll synchronization */}
         <ThreeBackground />

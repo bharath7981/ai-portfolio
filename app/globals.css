@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Void Neon Theme: Near-Black + Electric Violet + Cyan */
+  --color-ink: #08080F;
+  --color-ink-deep: #0D0D1A;
+  --color-paper: #F0EEFF;
+  --color-fog: #8B8FA8;
+  --color-signal: #A855F7;
+  --color-wire: #22D3EE;
+  --color-line: #1E1E2E;
+}
+
+[data-theme="white-light"] {
+  /* Pristine White Light Theme */
+  --color-ink: #f8fafc;
+  --color-ink-deep: #ffffff;
+  --color-paper: #0f172a;
+  --color-fog: #475569;
+  --color-signal: #d97706;
+  --color-wire: #0284c7;
+  --color-line: #cbd5e1;
+}
+
+[data-theme="cyber-emerald"] {
+  /* Cyber Emerald Matrix */
+  --color-ink: #06111d;
+  --color-ink-deep: #0b192c;
+  --color-paper: #f0fdf4;
+  --color-fog: #94a3b8;
+  --color-signal: #10b981;
+  --color-wire: #38bdf8;
+  --color-line: #1e293b;
+}
+
+[data-theme="violet-obsidian"] {
+  /* Deep Violet Obsidian */
+  --color-ink: #0a0d18;
+  --color-ink-deep: #111528;
+  --color-paper: #f5f3ff;
+  --color-fog: #9ca3af;
+  --color-signal: #8b5cf6;
+  --color-wire: #06b6d4;
+  --color-line: #1f2937;
+}
+
+[data-theme="monochrome-titanium"] {
+  /* Monochrome Slate & Sky */
+  --color-ink: #0f172a;
+  --color-ink-deep: #1e293b;
+  --color-paper: #f8fafc;
+  --color-fog: #94a3b8;
+  --color-signal: #38bdf8;
+  --color-wire: #a855f7;
+  --color-line: #334155;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  overscroll-behavior-y: auto;
+  transition: background-color 0.4s ease, color 0.4s ease;
+
+  /* Subtle dot-grid pattern for depth */
+  background-image: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.07) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--color-signal);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-wire);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Shimmer Gradient Text Animation ───────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #A855F7, #22D3EE, #F0EEFF, #A855F7);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ── Subtle Ambient Violet Glow Pulse ───────────────────────────────── */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), 0 0 40px rgba(168, 85, 247, 0.06); }
+  50%       { box-shadow: 0 0 30px rgba(168, 85, 247, 0.30), 0 0 60px rgba(168, 85, 247, 0.12); }
+}
+
+.glow-card {
+  animation: glow-pulse 3.5s ease-in-out infinite;
+}
+
+/* ── Cursor Spotlight Glow ─────────────────────────────────────────── */
+@keyframes beacon {
+  0%, 100% { opacity: 1; transform: scale(1);   }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+
+.beacon-dot {
+  animation: beacon 1.8s ease-in-out infinite;
+}

@@ -6,7 +6,7 @@ import { Edit3 } from "lucide-react";
 const NAV_ITEMS = [
   { label: "ABOUT", href: "#about" },
   { label: "PROJECTS", href: "#projects" },
-  { label: "GALLERY", href: "#gallery" },
+  { label: "SYSTEMS", href: "#gallery" },
   { label: "SKILLS", href: "#skills" },
   { label: "EXP", href: "#experience" },
   { label: "CONTACT", href: "#contact" },

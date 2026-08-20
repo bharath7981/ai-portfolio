@@ -1,9 +1,44 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "AI Engineer Portfolio",
+  metadataBase: new URL("https://bharath-portfolio-umber.vercel.app"),
+  title: "Bharath Rasalapu | AI & ML Engineer • Full Stack Architect",
   description:
-    "Portfolio showcasing AI engineering projects, skills, and experience — built with Next.js, GSAP, Framer Motion, and Three.js.",
+    "Portfolio of Bharath Rasalapu — AI/ML Engineer specializing in autonomous multi-agent systems (LangGraph), two-stage RAG architectures, and production full-stack engineering.",
+  keywords: [
+    "Bharath Rasalapu",
+    "AI Engineer",
+    "ML Engineer",
+    "LangGraph",
+    "RAG",
+    "FastAPI",
+    "Next.js",
+    "Python",
+    "Autonomous Agents",
+    "Machine Learning",
+  ],
+  authors: [{ name: "Bharath Rasalapu" }],
+  creator: "Bharath Rasalapu",
+  openGraph: {
+    title: "Bharath Rasalapu | AI & ML Engineer • Full Stack Architect",
+    description:
+      "Autonomous AI Agents, Two-Stage Vector RAG, and Production Engineering. Open for full-time AI/ML engineering roles.",
+    url: "https://bharath-portfolio-umber.vercel.app",
+    siteName: "Bharath Rasalapu Portfolio",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bharath Rasalapu | AI & ML Engineer",
+    description:
+      "Autonomous AI Agents, Two-Stage Vector RAG, and Production Engineering. Open for full-time AI/ML engineering roles.",
+    creator: "@bharath7981",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }) {

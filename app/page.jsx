@@ -23,8 +23,15 @@ import { Edit3 } from "lucide-react";
 export default function Home() {
   const [data, setData] = useState(initialPortfolioData);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    // Check if ?admin=true is present in URL
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setIsAdmin(params.get("admin") === "true");
+    }
+
     try {
       const saved = localStorage.getItem("portfolio_user_data");
       if (saved) {
@@ -72,7 +79,7 @@ export default function Home() {
     <SmoothScroll>
       <main className="relative bg-ink text-paper min-h-screen overflow-x-hidden">
         {/* Fixed Header navigation + scroll progress */}
-        <Header onOpenEditor={() => setEditorOpen(true)} />
+        <Header onOpenEditor={isAdmin ? () => setEditorOpen(true) : null} />
 
         {/* 3D Canvas Layer with scroll synchronization */}
         <ThreeBackground />
@@ -94,24 +101,28 @@ export default function Home() {
           </PortfolioFlow>
         </div>
 
-        {/* Floating Edit Details Button */}
-        <button
-          onClick={() => setEditorOpen(true)}
-          className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-signal text-ink font-mono text-xs uppercase tracking-widest font-semibold rounded-2xl shadow-2xl hover:bg-wire transition-colors duration-300 flex items-center gap-2 border border-ink"
-          title="Edit your website details anytime"
-        >
-          <Edit3 className="w-4 h-4" />
-          <span className="hidden sm:inline">EDIT DETAILS</span>
-        </button>
+        {/* Floating Edit Details Button (Admin Only via ?admin=true) */}
+        {isAdmin && (
+          <button
+            onClick={() => setEditorOpen(true)}
+            className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-signal text-ink font-mono text-xs uppercase tracking-widest font-semibold rounded-2xl shadow-2xl hover:bg-wire transition-colors duration-300 flex items-center gap-2 border border-ink"
+            title="Edit your website details anytime (Admin Mode)"
+          >
+            <Edit3 className="w-4 h-4" />
+            <span className="hidden sm:inline">EDIT DETAILS</span>
+          </button>
+        )}
 
         {/* Live Content Editor Modal */}
-        <ContentEditorModal
-          isOpen={editorOpen}
-          onClose={() => setEditorOpen(false)}
-          data={data}
-          onSave={handleSaveData}
-          onReset={handleResetData}
-        />
+        {isAdmin && (
+          <ContentEditorModal
+            isOpen={editorOpen}
+            onClose={() => setEditorOpen(false)}
+            data={data}
+            onSave={handleSaveData}
+            onReset={handleResetData}
+          />
+        )}
       </main>
     </SmoothScroll>
   );

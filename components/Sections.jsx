@@ -107,27 +107,31 @@ function useScramble(text, trigger, duration = 900) {
 
 // ── Scroll-Triggered CountUp Hook ────────────────────────────────────────────
 function useCountUp(target, inView, duration = 1200) {
-  const [count, setCount] = useState(0);
+  // Start with the actual real target value so initial HTML, no-JS, and slow paints NEVER show 0
+  const [display, setDisplay] = useState(target);
   const triggered = useRef(false);
+
   useEffect(() => {
     if (!inView || triggered.current) return;
     triggered.current = true;
     const numeric = parseFloat(target.replace(/[^0-9.]/g, ""));
     if (isNaN(numeric)) return;
+    const prefix = target.startsWith("<") ? "<" : "";
+    const suffix = target.replace(/[^a-zA-Z+%]/g, "");
     const start = performance.now();
     const tick = (now) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * numeric));
+      const val = Math.round(eased * numeric);
+      setDisplay(`${prefix}${val}${suffix}`);
       if (progress < 1) requestAnimationFrame(tick);
-      else setCount(numeric);
+      else setDisplay(target);
     };
     requestAnimationFrame(tick);
   }, [inView, target, duration]);
-  const prefix = target.startsWith("<") ? "<" : "";
-  const suffix = target.replace(/[^a-zA-Z+%]/g, "");
-  return `${prefix}${count}${suffix}`;
+
+  return display;
 }
 
 
@@ -197,14 +201,14 @@ function CountUpCard({ metric }) {
 // 1. HERO SECTION
 export function HeroSection({ data = {} }) {
   const name = data.name || "BHARATH RASALAPU";
-  const title = data.title || "FREELANCE AI ENGINEER & FULL STACK ARCHITECT";
+  const title = data.title || "AI / ML ENGINEER & FULL STACK ARCHITECT";
   const location = data.location || "INDIA • AVAILABLE WORLDWIDE";
-  const tagline = data.tagline || "Freelance AI Solutions • Agentic Workflows • Open to Work";
-  const subtagline = data.subtagline || "Freelance AI Engineer & Architect open for freelance contracts, custom LLM systems, autonomous agent workflows, production backends, and full-stack applications.";
-  const role = data.specRole || "Freelance AI Engineer";
-  const focus = data.specFocus || "Open to Work & Freelance Contracts";
-  const frontend = data.specFrontend || "Next.js / React / Three.js";
-  const backend = data.specBackend || "Python / FastAPI / LangGraph";
+  const tagline = data.tagline || "Autonomous AI Agents • Production RAG • Open for Full-Time Roles";
+  const subtagline = data.subtagline || "AI / ML Engineer specializing in multi-agent orchestration (LangGraph), high-throughput vector retrieval (RAG), production ML pipelines, and full-stack applications. Actively seeking full-time AI/ML engineering roles.";
+  const role = data.specRole || "AI / ML Engineer";
+  const focus = data.specFocus || "Open for Full-Time Roles & High-Impact Teams";
+  const frontend = data.specFrontend || "Next.js / React / TypeScript / Three.js";
+  const backend = data.specBackend || "Python / FastAPI / LangGraph / PyTorch";
 
   const firstName = name.split(" ")[0] || "BHARATH";
   const lastName = name.split(" ").slice(1).join(" ") || "RASALAPU";
@@ -224,13 +228,13 @@ export function HeroSection({ data = {} }) {
       >
         <motion.span variants={dropFromTop} className="flex items-center gap-1.5 sm:gap-2">
           <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-signal animate-ping" />
-          INTRO
+          SYSTEM ONLINE
         </motion.span>
         <motion.span variants={dropFromTop} className="hidden md:inline text-wire font-medium">
           {title}
         </motion.span>
         <motion.span variants={dropFromTop} className="text-fog/60 text-[9px] sm:text-xs">
-          {location}
+          LOCATION: {location}
         </motion.span>
       </motion.div>
 
@@ -265,7 +269,7 @@ export function HeroSection({ data = {} }) {
             {subtagline}
           </motion.p>
 
-          {/* Jelly Live Terminal Status Widget (Slide from Right) */}
+          {/* Jelly Live Terminal Status Widget */}
           <motion.div variants={slideFromRight}>
             <JellyCard className="p-3.5 sm:p-4 bg-ink-deep/90 border border-line/60 font-mono text-xs text-fog max-w-2xl space-y-1.5 rounded-xl shadow-lg shadow-black/30 overflow-hidden">
               <div className="flex items-center justify-between border-b border-line/40 pb-2 text-[10px] text-fog/60">
@@ -279,13 +283,13 @@ export function HeroSection({ data = {} }) {
                   <span className="text-signal">&gt;</span> <span><span className="text-wire font-semibold">LANGGRAPH:</span> Multi-agent DAG execution pipeline initialized.</span>
                 </p>
                 <p className="text-paper flex items-start gap-1.5">
-                  <span className="text-signal">&gt;</span> <span><span className="text-wire font-semibold font-mono">RETRIEVAL:</span> RAG vector index ready (ChromaDB + all-mpnet).</span>
+                  <span className="text-signal">&gt;</span> <span><span className="text-wire font-semibold font-mono">RETRIEVAL:</span> RAG vector index ready (ChromaDB + all-mpnet-base-v2).</span>
                 </p>
               </div>
             </JellyCard>
           </motion.div>
 
-          {/* Hero Action CTAs (Alternating Left / Right) */}
+          {/* Hero Action CTAs */}
           <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 overflow-hidden">
             <motion.a
               variants={slideFromLeft}
@@ -323,7 +327,7 @@ export function HeroSection({ data = {} }) {
           </div>
         </div>
 
-        {/* Jelly Blueprint Spec Panel (Slide from Right) */}
+        {/* Jelly Blueprint Spec Panel */}
         <motion.div variants={slideFromRight} className="lg:col-span-4 hidden lg:block">
           <JellyCard>
             <CornerFrame className="p-6 bg-ink-deep/80 backdrop-blur-md border border-line/60 space-y-4 rounded-2xl">
@@ -373,8 +377,8 @@ export function HeroSection({ data = {} }) {
 // 2. EDITORIAL ABOUT SECTION
 export function AboutSection({ data = {} }) {
   const bioHeader = data.bioHeader || "WHO I AM //";
-  const bioLead = data.bioLead || "I am an AI Engineer and Full Stack Developer focused on building autonomous LLM agents, high-throughput vector retrieval pipelines, and responsive web applications.";
-  const bioPara1 = data.bioPara1 || "My work bridges theoretical machine learning with practical software engineering. From architecting multi-agent decision graphs using LangGraph to engineering high-frequency REST APIs with FastAPI and crafting interactive UI interfaces in Next.js.";
+  const bioLead = data.bioLead || "I am an AI / ML Engineer and Full Stack Developer focused on building autonomous LLM agents, high-throughput vector retrieval pipelines, and responsive web applications.";
+  const bioPara1 = data.bioPara1 || "My work bridges machine learning research with robust software engineering — from architecting multi-agent decision graphs using LangGraph to engineering high-frequency REST APIs with FastAPI and crafting interactive UI interfaces in Next.js.";
   const bioPara2 = data.bioPara2 || "I believe modern software should be intelligent by design — enabling applications to reason, retrieve context, execute complex actions, and communicate seamlessly with users.";
 
   const metrics = [
@@ -523,21 +527,21 @@ export function AboutSection({ data = {} }) {
                     <span className="text-signal font-bold">01</span>
                     <div>
                       <span className="text-paper font-semibold block">Autonomous Coding Agents</span>
-                      <span className="text-fog/70 text-[11px]">Triaging test suites & PR automation</span>
+                      <span className="text-fog/70 text-[11px]">Docker container repair & PR automation</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 p-3 bg-ink/50 border border-line/40 rounded-xl">
                     <span className="text-wire font-bold">02</span>
                     <div>
-                      <span className="text-paper font-semibold block">Enterprise RAG Pipelines</span>
+                      <span className="text-paper font-semibold block">Two-Stage Legal RAG Systems</span>
                       <span className="text-fog/70 text-[11px]">Clause-level risk evaluation over contracts</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 p-3 bg-ink/50 border border-line/40 rounded-xl">
                     <span className="text-signal font-bold">03</span>
                     <div>
-                      <span className="text-paper font-semibold block">Interactive 3D Data Interfaces</span>
-                      <span className="text-fog/70 text-[11px]">Three.js visualization of neural traces</span>
+                      <span className="text-paper font-semibold block">Crop Stress ML Inference Server</span>
+                      <span className="text-fog/70 text-[11px]">100% Severe recall with XGBoost</span>
                     </div>
                   </li>
                 </ul>
@@ -583,83 +587,98 @@ function ProjectCard3D({ project, onSelect }) {
   const CardWrapper = project.useCorner ? CornerFrame : "div";
 
   return (
-    <JellyCard className="group h-full cursor-pointer" onClick={() => onSelect && onSelect(project)}>
-      <CardWrapper
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="h-full p-8 bg-ink-deep/90 backdrop-blur-md border border-line/60 hover:border-signal/80 transition-all duration-300 flex flex-col justify-between relative overflow-hidden rounded-2xl shadow-xl shadow-black/30"
-      >
-        <div
-          className="pointer-events-none absolute inset-0 transition-opacity duration-300 z-0 rounded-2xl"
-          style={glowStyle}
-        />
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Inspect ${project.name} system architecture and details`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect && onSelect(project);
+        }
+      }}
+      className="outline-none focus-visible:ring-2 focus-visible:ring-signal rounded-2xl h-full"
+    >
+      <JellyCard className="group h-full cursor-pointer" onClick={() => onSelect && onSelect(project)}>
+        <CardWrapper
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="h-full p-8 bg-ink-deep/90 backdrop-blur-md border border-line/60 hover:border-signal/80 transition-all duration-300 flex flex-col justify-between relative overflow-hidden rounded-2xl shadow-xl shadow-black/30"
+        >
+          <div
+            className="pointer-events-none absolute inset-0 transition-opacity duration-300 z-0 rounded-2xl"
+            style={glowStyle}
+          />
 
-        <div className="relative z-10 space-y-4" style={{ transform: "translateZ(24px)" }}>
-          <div className="flex items-center justify-between font-mono text-[11px] text-fog/70">
-            <span className="text-signal font-medium group-hover:text-wire transition-colors">
-              SYS.{project.id} // {project.highlight}
-            </span>
-            <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-              {project.github && (
-                <a
-                  href={project.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-paper transition-colors p-1"
-                  aria-label="GitHub Repository"
+          <div className="relative z-10 space-y-4" style={{ transform: "translateZ(24px)" }}>
+            <div className="flex items-center justify-between font-mono text-[11px] text-fog/70">
+              <span className="text-signal font-medium group-hover:text-wire transition-colors">
+                SYS.{project.id} // {project.highlight}
+              </span>
+              <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                {project.github && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-paper transition-colors p-1"
+                    aria-label={`View ${project.name} on GitHub`}
+                  >
+                    <Github className="w-4 h-4 text-fog group-hover:text-paper" />
+                  </a>
+                )}
+                {project.demo && (
+                  <a
+                    href={project.demo}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-signal transition-colors p-1"
+                    aria-label={`Open ${project.name} live repository`}
+                  >
+                    <ExternalLink className="w-4 h-4 text-fog group-hover:text-signal" />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <h3
+              className="font-display text-2xl sm:text-3xl font-semibold text-paper group-hover:text-signal transition-colors duration-300"
+              style={{ transform: "translateZ(36px)" }}
+            >
+              {project.name}
+            </h3>
+
+            <p
+              className="mt-4 text-fog text-sm sm:text-base leading-relaxed font-light"
+              style={{ transform: "translateZ(18px)" }}
+            >
+              {project.blurb}
+            </p>
+          </div>
+
+          <div
+            className="relative z-10 mt-8 pt-6 border-t border-line/40 flex flex-wrap items-center justify-between gap-4"
+            style={{ transform: "translateZ(28px)" }}
+          >
+            <div className="flex flex-wrap gap-2">
+              {project.tags && project.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 border border-line/60 text-fog bg-ink/50 rounded-md group-hover:border-signal/40 group-hover:text-paper transition-colors"
                 >
-                  <Github className="w-4 h-4 text-fog group-hover:text-paper" />
-                </a>
-              )}
-              {project.demo && (
-                <a
-                  href={project.demo}
-                  className="hover:text-signal transition-colors p-1"
-                  aria-label="Live Demo"
-                >
-                  <ExternalLink className="w-4 h-4 text-fog group-hover:text-signal" />
-                </a>
-              )}
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <div className="font-mono text-xs text-signal flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all group-hover:translate-x-2 font-semibold">
+              <span>EXPLORE</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </div>
-
-          <h3
-            className="font-display text-2xl sm:text-3xl font-semibold text-paper group-hover:text-signal transition-colors duration-300"
-            style={{ transform: "translateZ(36px)" }}
-          >
-            {project.name}
-          </h3>
-
-          <p
-            className="mt-4 text-fog text-sm sm:text-base leading-relaxed font-light"
-            style={{ transform: "translateZ(18px)" }}
-          >
-            {project.blurb}
-          </p>
-        </div>
-
-        <div
-          className="relative z-10 mt-8 pt-6 border-t border-line/40 flex flex-wrap items-center justify-between gap-4"
-          style={{ transform: "translateZ(28px)" }}
-        >
-          <div className="flex flex-wrap gap-2">
-            {project.tags && project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 border border-line/60 text-fog bg-ink/50 rounded-md group-hover:border-signal/40 group-hover:text-paper transition-colors"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <div className="font-mono text-xs text-signal flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-all group-hover:translate-x-2 font-semibold">
-            <span>EXPLORE</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </div>
-        </div>
-      </CardWrapper>
-    </JellyCard>
+        </CardWrapper>
+      </JellyCard>
+    </div>
   );
 }
 
@@ -667,10 +686,23 @@ function ProjectCard3D({ project, onSelect }) {
 function ProjectDetailModal({ project, onClose }) {
   if (!project) return null;
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  const [activeTab, setActiveTab] = useState("architecture");
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-lg"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-project-title"
     >
       <div
         className="w-full max-w-4xl max-h-[90vh] bg-ink-deep border border-line/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-paper"
@@ -1103,119 +1135,43 @@ export function ProjectsSection({ data = [] }) {
   );
 }
 
-// 3.5. PROJECT GALLERY SECTION (WITH INTERACTIVE IMAGE UPLOAD)
+// 3.5. PROJECT GALLERY / ARCHITECTURE VISUAL SHOWCASE
 export function ProjectGallerySection() {
-  const defaultItems = [
+  const architectureShowcases = [
     {
-      id: "g1",
-      title: "Autonomous Agent Dashboard UI",
-      category: "LLM WORKFLOW",
-      description: "Multi-agent execution graph visualization and live token telemetry dashboard.",
-      image: null,
+      id: "arch_01",
+      sys: "SYS.01",
+      title: "Autonomous DevOps Agent DAG",
+      category: "LANGGRAPH AGENT FLOW",
+      badge: "SELF-HEALING SRE",
+      desc: "Reflexive StateGraph execution loop that captures Docker crash events, retrieves historical incidents via ChromaDB RAG, uses Gemini 1.5 Pro CoT reasoning for surgical fixes, and verifies builds before human-authorized PR dispatch.",
+      steps: ["Observe & Capture", "Incident Vector RAG", "Gemini CoT Diagnosis", "Surgical Code Patch", "Docker Build Gate", "HITL PR Dispatch"],
+      metrics: "100% Deterministic Fix Validation",
+      tech: "LangGraph • Gemini 1.5 Pro • Docker SDK • ChromaDB",
     },
     {
-      id: "g2",
-      title: "Enterprise RAG Contract Analyzer",
-      category: "VECTOR SEARCH",
-      description: "High-throughput vector search pipeline over complex financial & legal agreements.",
-      image: null,
+      id: "arch_02",
+      sys: "SYS.02",
+      title: "Two-Stage Legal RAG Pipeline",
+      category: "NEURAL RETRIEVAL",
+      badge: "ZERO HALLUCINATION",
+      desc: "High-precision two-stage retrieval pipeline combining all-mpnet-base-v2 dense embeddings in ChromaDB with ms-marco-MiniLM-L-6-v2 CrossEncoder reranking down to top-3 highest precision chunks for grounded Gemini 2.0 contract evaluation.",
+      steps: ["PDF Chunking & Ingestion", "Dense Vector Search", "CrossEncoder Reranking", "Cosine Relevance Score", "Grounded Gemini Generation"],
+      metrics: "Top-3 Precision Focused",
+      tech: "ChromaDB • CrossEncoder • Gemini 2.0 Flash • FastAPI",
     },
     {
-      id: "g3",
-      title: "High-Frequency API Microservices",
-      category: "FASTAPI BACKEND",
-      description: "Asynchronous Python REST services with sub-120ms p99 query latency benchmarks.",
-      image: null,
+      id: "arch_03",
+      sys: "SYS.03",
+      title: "Crop Stress ML Inference Pipeline",
+      category: "ML CLASSIFICATION",
+      badge: "100% SEVERE RECALL",
+      desc: "End-to-end environmental telemetry processing pipeline engineering 5 custom agronomic indices (Heat Stress, Moisture Deficit, NDVI Change) feeding a tuned XGBoost classifier served over a sub-10ms FastAPI REST architecture.",
+      steps: ["Telemetry Ingestion", "5 Agronomic Indices", "XGBoost Classification", "Pydantic Validation", "FastAPI /predict Endpoint"],
+      metrics: "98.9% Accuracy • 100% Severe Recall",
+      tech: "XGBoost • Python • FastAPI • Scikit-Learn",
     },
   ];
-
-  const [gallery, setGallery] = useState([]);
-  const [lightboxImage, setLightboxImage] = useState(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("portfolio_gallery_items");
-    if (saved) {
-      try {
-        setGallery(JSON.parse(saved));
-      } catch (e) {
-        setGallery(defaultItems);
-      }
-    } else {
-      setGallery(defaultItems);
-    }
-  }, []);
-
-  // Instant 0ms state update + non-blocking deferred storage save
-  const saveGallery = (newGallery) => {
-    setGallery(newGallery);
-    setTimeout(() => {
-      try {
-        localStorage.setItem("portfolio_gallery_items", JSON.stringify(newGallery));
-      } catch (e) {
-        console.error("Storage save warning:", e);
-      }
-    }, 0);
-  };
-
-  // High-performance canvas image compression (reduces 8MB files to ~80KB WebP)
-  const handleImageUpload = (id, event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
-        const maxDim = 1200;
-
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const compressedDataUrl = canvas.toDataURL("image/webp", 0.78);
-        const updated = gallery.map((item) => (item.id === id ? { ...item, image: compressedDataUrl } : item));
-        saveGallery(updated);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleRemoveImage = (id) => {
-    const updated = gallery.map((item) => (item.id === id ? { ...item, image: null } : item));
-    saveGallery(updated);
-  };
-
-  const handleAddSlot = () => {
-    const newId = `g_${Date.now()}`;
-    const newSlot = {
-      id: newId,
-      title: `Project Showcase #${gallery.length + 1}`,
-      category: "SYSTEM GRAPHIC",
-      description: "Project screenshot, architectural diagram, or UI prototype preview.",
-      image: null,
-    };
-    saveGallery([...gallery, newSlot]);
-  };
-
-  const handleDeleteSlot = (id) => {
-    const updated = gallery.filter((item) => item.id !== id);
-    saveGallery(updated);
-  };
 
   return (
     <section
@@ -1228,107 +1184,73 @@ export function ProjectGallerySection() {
         viewport={{ once: false, amount: 0.1 }}
         variants={staggerContainer}
       >
-        <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
-          <SectionHeader label="PROJECT GALLERY" subtitle="Visual System Showcase & Architecture Screenshots" />
-          <motion.button
-            variants={fadeInUp}
-            onClick={handleAddSlot}
-            className="mb-8 font-mono text-xs uppercase tracking-widest px-4 py-2.5 bg-signal text-ink hover:bg-wire font-semibold rounded-xl transition-colors flex items-center gap-2 shadow-lg shadow-signal/20"
-          >
-            <Plus className="w-4 h-4" />
-            <span>ADD PROJECT SLOT</span>
-          </motion.button>
-        </div>
+        <SectionHeader
+          index="03.5"
+          label="SYSTEM ARCHITECTURES"
+          subtitle="Visual Pipeline Blueprints & Multi-Agent Execution Graphs"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
-          {gallery.map((item) => (
-            <motion.div
-              key={item.id}
-              variants={fadeInUp}
-            >
+          {architectureShowcases.map((item) => (
+            <motion.div key={item.id} variants={fadeInUp}>
               <JellyCard className="h-full">
-                <CornerFrame className="p-6 bg-ink-deep/90 border border-line/60 rounded-2xl h-full flex flex-col justify-between space-y-4 hover:border-signal/70 transition-all shadow-xl">
-                  {/* Card Top Label & Delete Slot Button */}
-                  <div className="flex items-center justify-between font-mono text-xs text-fog/70 border-b border-line/40 pb-3">
-                    <span className="text-signal font-semibold uppercase">{item.category}</span>
-                    <button
-                      onClick={() => handleDeleteSlot(item.id)}
-                      className="text-fog/50 hover:text-red-400 p-1 transition-colors"
-                      title="Delete slot"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                <CornerFrame className="p-6 bg-ink-deep/90 border border-line/60 rounded-2xl h-full flex flex-col justify-between space-y-5 hover:border-signal/70 transition-all shadow-xl">
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between font-mono text-xs border-b border-line/40 pb-3">
+                    <span className="text-signal font-bold uppercase">{item.sys} // {item.category}</span>
+                    <span className="text-[10px] text-wire bg-wire/10 border border-wire/30 px-2 py-0.5 rounded-full font-semibold">
+                      {item.badge}
+                    </span>
                   </div>
 
-                  {/* Image Display / Upload Box */}
-                  <div className="relative aspect-video rounded-xl bg-ink/80 border border-line/50 overflow-hidden flex flex-col items-center justify-center group">
-                    {item.image ? (
-                      <>
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        {/* Hover Overlay Controls */}
-                        <div className="absolute inset-0 bg-ink-deep/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-                          <button
-                            onClick={() => setLightboxImage(item.image)}
-                            className="p-2 bg-signal text-ink rounded-lg font-mono text-xs flex items-center gap-1 font-semibold hover:bg-wire transition-colors"
-                            title="View Lightbox"
-                          >
-                            <ZoomIn className="w-4 h-4" />
-                            <span>VIEW</span>
-                          </button>
-                          <label className="p-2 bg-ink border border-line text-paper rounded-lg font-mono text-xs flex items-center gap-1 cursor-pointer hover:border-signal transition-colors">
-                            <Upload className="w-4 h-4 text-wire" />
-                            <span>CHANGE</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => handleImageUpload(item.id, e)}
-                            />
-                          </label>
-                          <button
-                            onClick={() => handleRemoveImage(item.id)}
-                            className="p-2 bg-ink border border-line text-red-400 rounded-lg font-mono text-xs hover:border-red-400 transition-colors"
-                            title="Remove image"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                  {/* Visual Blueprint Representation */}
+                  <div className="p-4 bg-ink/80 border border-line/50 rounded-xl space-y-3">
+                    <div className="font-mono text-[10px] text-fog/60 uppercase tracking-widest flex items-center justify-between">
+                      <span>PIPELINE EXECUTION GRAPH</span>
+                      <span className="h-1.5 w-1.5 rounded-full bg-signal animate-pulse" />
+                    </div>
+                    <div className="space-y-1.5">
+                      {item.steps.map((step, idx) => (
+                        <div
+                          key={step}
+                          className="flex items-center gap-2 font-mono text-[11px] p-1.5 bg-ink-deep/60 rounded border border-line/30 text-paper/90"
+                        >
+                          <span className="text-signal font-bold text-[10px]">0{idx + 1}</span>
+                          <span className="text-wire text-[10px]">→</span>
+                          <span className="truncate">{step}</span>
                         </div>
-                      </>
-                    ) : (
-                      <label className="w-full h-full p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group/upload hover:bg-wire/5 transition-colors">
-                        <div className="h-12 w-12 rounded-full bg-signal/10 border border-signal/40 flex items-center justify-center group-hover/upload:scale-110 transition-transform">
-                          <Upload className="w-6 h-6 text-signal" />
-                        </div>
-                        <div className="text-center space-y-1">
-                          <span className="font-mono text-xs uppercase font-semibold text-paper group-hover/upload:text-signal transition-colors block">
-                            ➕ UPLOAD PROJECT IMAGE
-                          </span>
-                          <span className="font-mono text-[10px] text-fog/60 block">
-                            Click to select PNG, JPG, or WebP screenshot
-                          </span>
-                        </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => handleImageUpload(item.id, e)}
-                        />
-                      </label>
-                    )}
+                      ))}
+                    </div>
                   </div>
 
                   {/* Card Title & Description */}
-                  <div className="space-y-2 pt-2">
-                    <h3 className="font-display text-xl font-semibold text-paper">
+                  <div className="space-y-2 pt-1">
+                    <h3 className="font-display text-xl font-bold text-paper">
                       {item.title}
                     </h3>
                     <p className="text-fog text-xs font-light leading-relaxed">
-                      {item.description}
+                      {item.desc}
                     </p>
+                  </div>
+
+                  {/* Card Footer Tech Badge */}
+                  <div className="pt-3 border-t border-line/40 font-mono text-[10px] text-fog/70 flex items-center justify-between">
+                    <span className="text-wire font-medium">{item.metrics}</span>
+                    <a
+                      href="#projects"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const el = document.getElementById("projects");
+                        if (el) {
+                          if (window.lenis) window.lenis.scrollTo(el, { offset: -60 });
+                          else el.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
+                      className="text-signal hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      <span>INSPECT</span>
+                      <span>↗</span>
+                    </a>
                   </div>
                 </CornerFrame>
               </JellyCard>
@@ -1336,24 +1258,6 @@ export function ProjectGallerySection() {
           ))}
         </div>
       </motion.div>
-
-      {/* Lightbox Image Preview Modal */}
-      {lightboxImage && (
-        <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md p-6 flex items-center justify-center">
-          <button
-            onClick={() => setLightboxImage(null)}
-            className="absolute top-6 right-6 p-3 bg-ink-deep border border-line text-paper hover:text-signal rounded-full font-mono text-xs flex items-center gap-2"
-          >
-            <X className="w-5 h-5" />
-            <span>CLOSE</span>
-          </button>
-          <img
-            src={lightboxImage}
-            alt="Project Preview"
-            className="max-w-full max-h-[85vh] rounded-2xl border border-line/80 shadow-2xl object-contain"
-          />
-        </div>
-      )}
     </section>
   );
 }
